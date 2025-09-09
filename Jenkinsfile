@@ -35,7 +35,7 @@ pipeline {
                    git add deployment.yaml
                    git commit -m "Updated Deployment Manifest"
                 """
-                withCredentials([gitUsernamePassword(credentialsId: 'Org', gitToolName: 'Default')]) {
+                withCredentials([gitUsernamePassword(credentialsId: 'Org1', gitToolName: 'Default')]) {
                   sh "git push https://github.com/Varshitha-DevTools/gitops-register-app.git main"
                 }
             }
@@ -44,18 +44,13 @@ pipeline {
     }
 
      post {
-    failure {
-    emailext (
-        body: """
-            <h3>Build Failed</h3>
-            <p>Job: ${env.JOB_NAME}</p>
-            <p>Build Number: ${env.BUILD_NUMBER}</p>
-            <p>Status: FAILURE</p>
-        """,
-        subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - Failed",
-        mimeType: 'text/html',
-        to: "varshithag@devtools.in"
-    )
+        failure {
+            emailext(
+                body: '''${SCRIPT, template="groovy-html.template"}''',
+                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed",
+                mimeType: 'text/html',
+                to: "varshithag303@gmail.com"
+            )
 
 
         // Create GitHub Issue
@@ -89,12 +84,13 @@ pipeline {
         }    
     }
     
-    success {
-    emailext (
-        body: "Job: ${env.JOB_NAME}\nBuild Number: ${env.BUILD_NUMBER}\nStatus: SUCCESS",
-        subject: "${env.JOB_NAME} - Build #${env.BUILD_NUMBER} - Successful",
-        to: "varshithag@devtools.in"
-    )
+     success {
+            emailext(
+                body: '''${SCRIPT, template="groovy-html.template"}''',
+                subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful",
+                mimeType: 'text/html',
+                to: "varshithag303@gmail.com"
+            )
 }
 }
 }
